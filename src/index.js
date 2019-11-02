@@ -1,29 +1,34 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import ApolloClient from 'apollo-boost';
-import { gql } from 'apollo-boost';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { createHttpLink } from "apollo-link-http";
+import * as serviceWorker from "./serviceWorker";
 
-const client = new ApolloClient({
-  uri: 'http://localhost:4000',  
+// GraphQL-specific
+import { ApolloClient } from "apollo-boost";
+import { ApolloProvider } from "react-apollo-hooks"
+
+
+// ApolloProvider wraps the React app and places the Apollo client
+// on the React context so the client can be conveniently accessed
+// from anywhere in the component tree.
+
+const httpLink = createHttpLink({
+  uri: 'http://localhost:4000'
 });
 
-client
-  .query({
-    query: gql`
-    {
-      users
-      {
-        username
-      }
-    }
-    `
-  })
-  .then(result => console.log(result));
+const client = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache()
+});
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+  <ApolloProvider client={client}>    
+    <App />  
+  </ApolloProvider>,
+  document.getElementById("root")
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
