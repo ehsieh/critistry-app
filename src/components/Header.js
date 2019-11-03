@@ -30,7 +30,7 @@ export default function Header() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            News
+            Critistry
           </Typography>
           <Button color="inherit">Login</Button>
         </Toolbar>
