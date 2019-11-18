@@ -77,7 +77,7 @@ export function RequestList() {
   if (error) return `Error! ${error.message}`;
   console.log("width: " + width);
   return (    
-    <GridList cellHeight={240} className={classes.gridList} cols={getGridListCols()}>
+    <GridList cellHeight={300} className={classes.gridList} cols={getGridListCols()}>
     {data.critRequests.map(r => (
       <GridListTile key={r.id} cols={1}>
         <img src={r.image} alt={r.title} />
