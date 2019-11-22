@@ -18,6 +18,10 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import { useQuery } from "react-apollo-hooks";
+import gql from "graphql-tag";
+import { useApolloClient } from 'react-apollo-hooks';
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -33,6 +37,12 @@ const useStyles = makeStyles(theme => ({
     width: 250,
   },
 }));
+
+const IS_LOGGED_IN = gql`
+  query IsUserLoggedIn {
+    isLoggedIn @client
+  }
+`;
 
 export default function Header() {
   const classes = useStyles();
@@ -79,6 +89,34 @@ export default function Header() {
     </div>
   );
 
+  const history = useHistory();      
+  const client = useApolloClient();
+
+  const SignOut = () => {
+    localStorage.removeItem('auth-token');
+    client.writeData({ data: { isLoggedIn: false } });
+    history.push('/');
+  }
+
+  function IsLoggedIn() {
+    const { data } = useQuery(IS_LOGGED_IN);
+    return data.isLoggedIn ? 
+    <React.Fragment>
+      <Button
+        variant="contained"
+        color="default"
+        className={classes.button}
+        startIcon={<AddIcon />}
+      >New Request</Button>
+      <Button onClick={ SignOut } color="inherit">Sign Out</Button>
+    </React.Fragment>
+    : 
+    <React.Fragment>
+      <Button href="/signin" color="inherit">Sign In</Button>
+      <Button href="/signup" color="inherit">Sign Up</Button>
+    </React.Fragment>
+  }
+
   return (
     <div className={classes.root}>
       <AppBar>
@@ -95,19 +133,8 @@ export default function Header() {
           </IconButton>
           <Typography variant="h6" className={classes.title}>
             <Link color="inherit" underline="none" href="/">Critistry</Link>
-          </Typography>
-
-          
-          <Button
-            variant="contained"
-            color="default"
-            className={classes.button}
-            startIcon={<AddIcon />}
-          >
-            New Request
-          </Button>
-          <Button href="/signin" color="inherit">Sign In</Button>
-          <Button href="/signup" color="inherit">Sign Up</Button>
+          </Typography>          
+          <IsLoggedIn />
         </Toolbar>
       </AppBar>
     </div>

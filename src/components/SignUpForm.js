@@ -13,7 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import gql from 'graphql-tag';
-import { useMutation } from 'react-apollo-hooks';
+import { useMutation, useApolloClient } from 'react-apollo-hooks';
 import { getThemeProps } from '@material-ui/styles';
 import { useHistory } from "react-router-dom";
 
@@ -56,6 +56,7 @@ export default function SignUpForm() {
 
   const history = useHistory();    
   const classes = useStyles();
+  const client = useApolloClient();
   const [signUp, { data }] = useMutation(SIGNUP_MUTATION);    
   const [user, setUser] = useState({
     username: "",
@@ -103,6 +104,7 @@ export default function SignUpForm() {
               .then((result) => {
                 console.log(result.data.signup.token);
                 localStorage.setItem('auth-token', result.data.signup.token);   
+                client.writeData({ data: { isLoggedIn: true } });
                 history.push('/');
               });
           }}

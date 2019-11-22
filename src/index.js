@@ -8,6 +8,7 @@ import * as serviceWorker from "./serviceWorker";
 // GraphQL-specific
 import { ApolloClient } from "apollo-boost";
 import { ApolloProvider } from "react-apollo-hooks"
+import { resolvers, typeDefs } from "./Resolvers";
 
 
 // ApolloProvider wraps the React app and places the Apollo client
@@ -20,7 +21,15 @@ const httpLink = createHttpLink({
 
 const client = new ApolloClient({
   link: httpLink,
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
+  typeDefs,
+  resolvers
+});
+
+client.writeData({
+  data: {
+    isLoggedIn: !!localStorage.getItem('auth-token')
+  }
 });
 
 ReactDOM.render(
