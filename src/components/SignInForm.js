@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,6 +12,9 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import gql from "graphql-tag";
+import { useMutation, useApolloClient } from 'react-apollo-hooks';
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -39,8 +42,62 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function SignInForm() {
-  const classes = useStyles();
 
+  const SIGNIN_MUTATION = gql`
+    mutation SignIn($username: String!, $password: String!) {
+      signin(username: $username, password: $password) {
+        token
+        user {
+          username
+        }
+      }
+    }
+  `;
+  const classes = useStyles();
+  const history = useHistory();      
+  const client = useApolloClient();
+  const [signIn, { data }] = useMutation(SIGNIN_MUTATION);    
+  const [user, setUser] = useState({
+    username: "",    
+    password: "",
+    usernameError: null,
+    passwordError: null
+  })
+
+  const handleChange = name => event => {
+    setUser({
+      ...user,
+      [name]: event.target.value
+    }
+    );
+  };
+
+  const isFormValid = event => {
+    return (
+      user.username.length > 0 &&      
+      user.password.length > 0
+    );
+  };
+
+  const handleErrors = (errors) => {
+    console.log(errors);    
+    if (errors[0].field == 'username') {
+      setUser({
+        ...user,
+        usernameError: errors[0].message,
+        passwordError: null
+      });
+    } else if (errors[0].field == 'password') {
+      setUser({
+        ...user,
+        passwordError: errors[0].message,
+        usernameError: null
+      });
+    }
+    console.log(user);
+  };
+
+  //if (error) handleError();
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -51,7 +108,27 @@ export default function SignInForm() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate>
+        <form 
+          className={classes.form} 
+          noValidate
+          onSubmit={e => {
+            e.preventDefault();
+            signIn({ variables: 
+              { 
+                username: user.username,                 
+                password: user.password
+              } })
+              .then((result) => {                
+                console.log(result.data.signin.token);
+                localStorage.setItem('auth-token', result.data.signin.token);   
+                client.writeData({ data: { isLoggedIn: true } });
+                history.push('/');
+              })
+              .catch(error => {
+                handleErrors(error.graphQLErrors);
+              });
+          }}
+        >
           <TextField
             variant="outlined"
             margin="normal"
@@ -60,8 +137,12 @@ export default function SignInForm() {
             id="username"
             label="User Name"
             name="username"
+            value={user.username}
+            onChange={handleChange('username')}
             autoComplete="username"
-            autoFocus
+            autoFocus            
+            helperText={user.usernameError}
+            error={user.usernameError != null}
           />
           <TextField
             variant="outlined"
@@ -72,26 +153,25 @@ export default function SignInForm() {
             label="Password"
             type="password"
             id="password"
-            autoComplete="current-password"
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
+            value={user.password}
+            onChange={handleChange('password')}
+            autoComplete="current-password"            
+            helperText={user.passwordError}
+            error={user.passwordError != null}
+          />          
           <Button
             type="submit"
             fullWidth
             variant="contained"
             color="primary"
             className={classes.submit}
+            disabled={!isFormValid()}
           >
             Sign In
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
+            
             </Grid>
             <Grid item>
               <Link href="/signup" variant="body2">

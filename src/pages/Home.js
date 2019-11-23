@@ -1,7 +1,8 @@
 import React from "react"
 import RequestList from "../components/RequestList"
+import Loading from "../components/Loading"
 
-const Home = () => (
+const Home = () => (    
     <RequestList></RequestList>
 );
 

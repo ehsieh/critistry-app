@@ -14,7 +14,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import gql from 'graphql-tag';
 import { useMutation, useApolloClient } from 'react-apollo-hooks';
-import { getThemeProps } from '@material-ui/styles';
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
@@ -150,13 +149,7 @@ export default function SignUpForm() {
                 onChange={handleChange('password')}
                 autoComplete="current-password"
               />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                label="I want to receive notifications via email."
-              />
-            </Grid>
+            </Grid>                      
           </Grid>
           <Button
             type="submit"
