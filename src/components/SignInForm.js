@@ -79,8 +79,7 @@ export default function SignInForm() {
     );
   };
 
-  const handleErrors = (errors) => {
-    console.log(errors);    
+  const handleErrors = (errors) => {    
     if (errors[0].field == 'username') {
       setUser({
         ...user,
@@ -93,8 +92,7 @@ export default function SignInForm() {
         passwordError: errors[0].message,
         usernameError: null
       });
-    }
-    console.log(user);
+    }    
   };
 
   //if (error) handleError();

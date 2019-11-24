@@ -60,7 +60,10 @@ export default function SignUpForm() {
   const [user, setUser] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
+    usernameError: null,
+    emailError: null,
+    passwordError: null
   })
 
   const handleChange = name => event => {
@@ -77,6 +80,33 @@ export default function SignUpForm() {
       user.email.length > 0 &&
       user.password.length > 0
     );
+  };
+
+  const handleErrors = (errors) => {
+    console.log(errors);        
+    user.usernameError = null;
+    user.emailError = null;
+    user.passwordError = null;
+    
+    console.log(user);
+
+    if (errors[0].details) {
+      if (errors[0].details.username) {        
+        user.usernameError = errors[0].details.username[0];        
+      }
+
+      if (errors[0].details.email) {
+        user.emailError = errors[0].details.email[0];  
+      }
+
+      if (errors[0].details.password) {
+        user.passwordError = errors[0].details.password[0];    
+      }      
+    }
+
+    setUser({
+      ...user,     
+    });
   };
 
   return (
@@ -105,6 +135,9 @@ export default function SignUpForm() {
                 localStorage.setItem('auth-token', result.data.signup.token);   
                 client.writeData({ data: { isLoggedIn: true } });
                 history.push('/');
+              })
+              .catch(error => {
+                handleErrors(error.graphQLErrors);
               });
           }}
         >
@@ -121,6 +154,8 @@ export default function SignUpForm() {
                 value={user.username}
                 onChange={handleChange('username')}
                 autoFocus
+                error={user.usernameError != null}
+                helperText={user.usernameError}
               />
             </Grid>
             <Grid item xs={12}>
@@ -134,6 +169,8 @@ export default function SignUpForm() {
                 value={user.email}
                 onChange={handleChange('email')}
                 autoComplete="email"
+                error={user.emailError != null}
+                helperText={user.emailError}
               />
             </Grid>
             <Grid item xs={12}>
@@ -148,6 +185,8 @@ export default function SignUpForm() {
                 value={user.password}
                 onChange={handleChange('password')}
                 autoComplete="current-password"
+                error={user.passwordError != null}
+                helperText={user.passwordError}
               />
             </Grid>                      
           </Grid>
