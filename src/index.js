@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { createHttpLink } from "apollo-link-http";
+import { setContext } from "apollo-link-context";
 import * as serviceWorker from "./serviceWorker";
 
 // GraphQL-specific
@@ -19,8 +20,21 @@ const httpLink = createHttpLink({
   uri: 'http://localhost:4000'
 });
 
+// If an authentication token exists in local storage, put
+// the token in the "Authorization" request header.
+// Returns an object to set the context of the GraphQL request.
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem("auth-token");
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : ""
+    }
+  };
+});
+
 const client = new ApolloClient({
-  link: httpLink,
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
   typeDefs,
   resolvers

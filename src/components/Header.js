@@ -107,6 +107,7 @@ export default function Header() {
         color="default"
         className={classes.button}
         startIcon={<AddIcon />}
+        href="/new-request"
       >New Request</Button>
       <Button onClick={ SignOut } color="inherit">Sign Out</Button>
     </React.Fragment>
