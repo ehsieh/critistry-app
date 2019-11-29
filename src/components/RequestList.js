@@ -5,6 +5,7 @@ import { ThemeProvider, useTheme, createMuiTheme } from '@material-ui/core/style
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { makeStyles } from '@material-ui/core/styles';
 import GridList from '@material-ui/core/GridList';
+import Link from '@material-ui/core/Link';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import RequestCard from "../components/RequestCard"
@@ -80,7 +81,7 @@ export function RequestList() {
     <GridList cellHeight={300} className={classes.gridList} cols={getGridListCols()}>
     {data.critRequests.map(r => (
       <GridListTile key={r.id} cols={1}>
-        <img src={r.image} alt={r.title} />
+        <a href={`/request/${r.id}`}><img src={r.image} alt={r.title} /></a>
         <GridListTileBar
             title={r.title}
             subtitle={<span>by: {r.user.username}</span>}        
