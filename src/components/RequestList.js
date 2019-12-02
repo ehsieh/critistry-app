@@ -1,14 +1,13 @@
 import React from "react"
 import { useQuery } from "react-apollo-hooks";
 import gql from "graphql-tag";
-import { ThemeProvider, useTheme, createMuiTheme } from '@material-ui/core/styles';
+import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { makeStyles } from '@material-ui/core/styles';
 import GridList from '@material-ui/core/GridList';
 import Link from '@material-ui/core/Link';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
-import RequestCard from "../components/RequestCard"
 
 const GET_REQUESTS = gql`
 {
@@ -51,6 +50,9 @@ const useStyles = makeStyles(theme => ({
       width: '100%',
       
     },
+    link: {
+      color: theme.palette.common.white,      
+    }
   }));
 
 export function RequestList() {
@@ -81,9 +83,9 @@ export function RequestList() {
     <GridList cellHeight={300} className={classes.gridList} cols={getGridListCols()}>
     {data.critRequests.map(r => (
       <GridListTile key={r.id} cols={1}>
-        <a href={`/request/${r.id}`}><img src={r.image} alt={r.title} /></a>
+        <img src={r.image} alt={r.title} />
         <GridListTileBar
-            title={r.title}
+            title={<Link className={classes.link} href={`/request/${r.id}`}>{r.title}</Link>}
             subtitle={<span>by: {r.user.username}</span>}        
         />
       </GridListTile>

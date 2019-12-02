@@ -7,9 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
@@ -89,7 +87,7 @@ export default function Header() {
     </div>
   );
 
-  const history = useHistory();      
+  const history = useHistory();
   const client = useApolloClient();
 
   const SignOut = () => {
@@ -100,22 +98,22 @@ export default function Header() {
 
   function IsLoggedIn() {
     const { data } = useQuery(IS_LOGGED_IN);
-    return data.isLoggedIn ? 
-    <React.Fragment>
-      <Button
-        variant="contained"
-        color="default"
-        className={classes.button}
-        startIcon={<AddIcon />}
-        href="/new-request"
-      >New Request</Button>
-      <Button onClick={ SignOut } color="inherit">Sign Out</Button>
-    </React.Fragment>
-    : 
-    <React.Fragment>
-      <Button href="/signin" color="inherit">Sign In</Button>
-      <Button href="/signup" color="inherit">Sign Up</Button>
-    </React.Fragment>
+    return data.isLoggedIn ?
+      <React.Fragment>
+        <Button
+          variant="contained"
+          color="default"
+          className={classes.button}
+          startIcon={<AddIcon />}
+          href="/new-request"
+        >New Request</Button>
+        <Button onClick={SignOut} color="inherit">Sign Out</Button>
+      </React.Fragment>
+      :
+      <React.Fragment>
+        <Button href="/signin" color="inherit">Sign In</Button>
+        <Button href="/signup" color="inherit">Sign Up</Button>
+      </React.Fragment>
   }
 
   return (
@@ -134,7 +132,7 @@ export default function Header() {
           </IconButton>
           <Typography variant="h6" className={classes.title}>
             <Link color="inherit" underline="none" href="/">Critistry</Link>
-          </Typography>          
+          </Typography>
           <IsLoggedIn />
         </Toolbar>
       </AppBar>

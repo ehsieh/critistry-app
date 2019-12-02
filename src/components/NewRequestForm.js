@@ -3,14 +3,13 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import gql from 'graphql-tag';
-import { useMutation, useApolloClient } from 'react-apollo-hooks';
+import { useMutation } from 'react-apollo-hooks';
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
@@ -50,10 +49,9 @@ export default function NewRequestFrom() {
   }
   `;
 
-  const history = useHistory();    
+  const history = useHistory();
   const classes = useStyles();
-  const client = useApolloClient();
-  const [create_new_request, { data }] = useMutation(NEW_REQUEST_MUTATION);    
+  const [create_new_request, { data }] = useMutation(NEW_REQUEST_MUTATION);
   const [request, setRequest] = useState({
     title: "",
     description: "",
@@ -76,35 +74,7 @@ export default function NewRequestFrom() {
     );
   };
 
-  /*
-  const handleErrors = (errors) => {
-    console.log(errors);        
-    user.usernameError = null;
-    user.emailError = null;
-    user.passwordError = null;
-    
-    console.log(user);
-
-    if (errors[0].details) {
-      if (errors[0].details.username) {        
-        user.usernameError = errors[0].details.username[0];        
-      }
-
-      if (errors[0].details.email) {
-        user.emailError = errors[0].details.email[0];  
-      }
-
-      if (errors[0].details.password) {
-        user.passwordError = errors[0].details.password[0];    
-      }      
-    }
-
-    setUser({
-      ...user,     
-    });
-  };
-*/
-  return (  
+  return (
     <Container component="main" maxWidth="md">
       <CssBaseline />
       <div className={classes.paper}>
@@ -114,20 +84,22 @@ export default function NewRequestFrom() {
         <Typography component="h1" variant="h5">
           Create Crit Request
         </Typography>
-        <form 
-          className={classes.form} 
+        <form
+          className={classes.form}
           noValidate
           onSubmit={e => {
             console.log(request);
             e.preventDefault();
-            create_new_request({ variables: 
-              { 
-                title: request.title, 
-                description: request.description, 
+            create_new_request({
+              variables:
+              {
+                title: request.title,
+                description: request.description,
                 image: request.image
-              } })
+              }
+            })
               .then((result) => {
-                console.log(result);                
+                console.log(result);
                 history.push('/');
               })
               .catch(error => {
@@ -138,7 +110,7 @@ export default function NewRequestFrom() {
         >
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TextField                
+              <TextField
                 name="title"
                 variant="outlined"
                 required
@@ -148,8 +120,8 @@ export default function NewRequestFrom() {
                 value={request.title}
                 onChange={handleChange('title')}
                 autoFocus
-                //error={user.usernameError != null}
-                //helperText={user.usernameError}
+              //error={user.usernameError != null}
+              //helperText={user.usernameError}
               />
             </Grid>
             <Grid item xs={12}>
@@ -158,14 +130,14 @@ export default function NewRequestFrom() {
                 required
                 fullWidth
                 multiline
-                rows="5"                
+                rows="5"
                 id="description"
                 label="Description"
                 name="description"
                 value={request.description}
-                onChange={handleChange('description')}                
-                //error={user.emailError != null}
-                //helperText={user.emailError}
+                onChange={handleChange('description')}
+              //error={user.emailError != null}
+              //helperText={user.emailError}
               />
             </Grid>
             <Grid item xs={12}>
@@ -174,14 +146,14 @@ export default function NewRequestFrom() {
                 required
                 fullWidth
                 name="image"
-                label="Image"                
+                label="Image"
                 id="image"
                 value={request.image}
                 onChange={handleChange('image')}
-                //error={user.passwordError != null}
-                //helperText={user.passwordError}
+              //error={user.passwordError != null}
+              //helperText={user.passwordError}
               />
-            </Grid>                      
+            </Grid>
           </Grid>
           <Button
             type="submit"
@@ -192,7 +164,7 @@ export default function NewRequestFrom() {
             className={classes.submit}
           >
             Submit
-          </Button>          
+          </Button>
         </form>
       </div>
     </Container>

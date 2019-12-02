@@ -3,11 +3,8 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -53,10 +50,10 @@ export default function SignUpForm() {
   }
   `;
 
-  const history = useHistory();    
+  const history = useHistory();
   const classes = useStyles();
   const client = useApolloClient();
-  const [signUp, { data }] = useMutation(SIGNUP_MUTATION);    
+  const [signUp, { data }] = useMutation(SIGNUP_MUTATION);
   const [user, setUser] = useState({
     username: "",
     email: "",
@@ -83,29 +80,29 @@ export default function SignUpForm() {
   };
 
   const handleErrors = (errors) => {
-    console.log(errors);        
+    console.log(errors);
     user.usernameError = null;
     user.emailError = null;
     user.passwordError = null;
-    
+
     console.log(user);
 
     if (errors[0].details) {
-      if (errors[0].details.username) {        
-        user.usernameError = errors[0].details.username[0];        
+      if (errors[0].details.username) {
+        user.usernameError = errors[0].details.username[0];
       }
 
       if (errors[0].details.email) {
-        user.emailError = errors[0].details.email[0];  
+        user.emailError = errors[0].details.email[0];
       }
 
       if (errors[0].details.password) {
-        user.passwordError = errors[0].details.password[0];    
-      }      
+        user.passwordError = errors[0].details.password[0];
+      }
     }
 
     setUser({
-      ...user,     
+      ...user,
     });
   };
 
@@ -119,20 +116,22 @@ export default function SignUpForm() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form 
-          className={classes.form} 
+        <form
+          className={classes.form}
           noValidate
           onSubmit={e => {
             e.preventDefault();
-            signUp({ variables: 
-              { 
-                username: user.username, 
-                email: user.email, 
+            signUp({
+              variables:
+              {
+                username: user.username,
+                email: user.email,
                 password: user.password
-              } })
+              }
+            })
               .then((result) => {
                 console.log(result.data.signup.token);
-                localStorage.setItem('auth-token', result.data.signup.token);   
+                localStorage.setItem('auth-token', result.data.signup.token);
                 client.writeData({ data: { isLoggedIn: true } });
                 history.push('/');
               })
@@ -188,7 +187,7 @@ export default function SignUpForm() {
                 error={user.passwordError != null}
                 helperText={user.passwordError}
               />
-            </Grid>                      
+            </Grid>
           </Grid>
           <Button
             type="submit"

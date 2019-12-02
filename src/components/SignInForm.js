@@ -3,11 +3,8 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -54,11 +51,11 @@ export default function SignInForm() {
     }
   `;
   const classes = useStyles();
-  const history = useHistory();      
+  const history = useHistory();
   const client = useApolloClient();
-  const [signIn, { data }] = useMutation(SIGNIN_MUTATION);    
+  const [signIn, { data }] = useMutation(SIGNIN_MUTATION);
   const [user, setUser] = useState({
-    username: "",    
+    username: "",
     password: "",
     usernameError: null,
     passwordError: null
@@ -74,25 +71,25 @@ export default function SignInForm() {
 
   const isFormValid = event => {
     return (
-      user.username.length > 0 &&      
+      user.username.length > 0 &&
       user.password.length > 0
     );
   };
 
-  const handleErrors = (errors) => {    
-    if (errors[0].field == 'username') {
+  const handleErrors = (errors) => {
+    if (errors[0].field === 'username') {
       setUser({
         ...user,
         usernameError: errors[0].message,
         passwordError: null
       });
-    } else if (errors[0].field == 'password') {
+    } else if (errors[0].field === 'password') {
       setUser({
         ...user,
         passwordError: errors[0].message,
         usernameError: null
       });
-    }    
+    }
   };
 
   //if (error) handleError();
@@ -106,19 +103,21 @@ export default function SignInForm() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form 
-          className={classes.form} 
+        <form
+          className={classes.form}
           noValidate
           onSubmit={e => {
             e.preventDefault();
-            signIn({ variables: 
-              { 
-                username: user.username,                 
+            signIn({
+              variables:
+              {
+                username: user.username,
                 password: user.password
-              } })
-              .then((result) => {                
+              }
+            })
+              .then((result) => {
                 console.log(result.data.signin.token);
-                localStorage.setItem('auth-token', result.data.signin.token);   
+                localStorage.setItem('auth-token', result.data.signin.token);
                 client.writeData({ data: { isLoggedIn: true } });
                 history.push('/');
               })
@@ -138,7 +137,7 @@ export default function SignInForm() {
             value={user.username}
             onChange={handleChange('username')}
             autoComplete="username"
-            autoFocus            
+            autoFocus
             helperText={user.usernameError}
             error={user.usernameError != null}
           />
@@ -153,10 +152,10 @@ export default function SignInForm() {
             id="password"
             value={user.password}
             onChange={handleChange('password')}
-            autoComplete="current-password"            
+            autoComplete="current-password"
             helperText={user.passwordError}
             error={user.passwordError != null}
-          />          
+          />
           <Button
             type="submit"
             fullWidth
@@ -169,7 +168,7 @@ export default function SignInForm() {
           </Button>
           <Grid container>
             <Grid item xs>
-            
+
             </Grid>
             <Grid item>
               <Link href="/signup" variant="body2">
@@ -178,7 +177,7 @@ export default function SignInForm() {
             </Grid>
           </Grid>
         </form>
-      </div>     
+      </div>
     </Container>
   );
 }
