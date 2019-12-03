@@ -43,6 +43,16 @@ const GET_CRIT_REQUEST_QUERY = gql`
       title
       description
       image
+      critPosts
+      {
+        id
+        posttext        
+      }
+      user
+      {
+        id
+        username
+      }
     }
   }
 `;
