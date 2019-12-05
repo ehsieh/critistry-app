@@ -8,6 +8,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import NewRequest from "./pages/NewRequest";
 import Request from "./pages/Request";
+import Post from "./pages/Post";
 
 const App = () => (
   <BrowserRouter>
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/signup" exact component={SignUp} />
           <Route path="/new-request" exact component={NewRequest} />
           <Route path="/request/:id" component={Request} />
+          <Route path="/post/:id" component={Post} />
           <Route component={NotFound} />                   
         </Switch>
       </div>
