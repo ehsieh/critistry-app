@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2),
   },
   image: {
-    width: '700px'
+    maxWidth: '400px'
   }
 }));
 
@@ -46,7 +46,11 @@ const GET_CRIT_REQUEST_QUERY = gql`
       critPosts
       {
         id
-        posttext        
+        postText
+        user
+        {
+          username
+        }
       }
       user
       {
@@ -74,7 +78,7 @@ export default function Request() {
         <Typography component="h1" variant="h5">
           {data.critRequest.title}
         </Typography>
-        <img alt="" class={classes.image} src={data.critRequest.image} />
+        <img alt="" className={classes.image} src={data.critRequest.image} />
         <Typography component="h5" variant="h6">
           {data.critRequest.description}
         </Typography>

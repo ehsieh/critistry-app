@@ -1,21 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Link from '@material-ui/core/Link';
 import Toolbar from '@material-ui/core/Toolbar';
+import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import AddIcon from '@material-ui/icons/Add';
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
-import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { useQuery } from "react-apollo-hooks";
 import gql from "graphql-tag";
 import { useApolloClient } from 'react-apollo-hooks';
@@ -34,6 +27,12 @@ const useStyles = makeStyles(theme => ({
   list: {
     width: 250,
   },
+  avatar: {
+    width: 50,
+    height: 50,    
+    cursor: 'pointer',
+    marginLeft: theme.spacing(2)
+  }
 }));
 
 const IS_LOGGED_IN = gql`
@@ -44,51 +43,9 @@ const IS_LOGGED_IN = gql`
 
 export default function Header() {
   const classes = useStyles();
-
-  const [state, setState] = React.useState({
-    top: false,
-    left: false,
-    bottom: false,
-    right: false,
-  });
-
-  const toggleDrawer = (side, open) => event => {
-    if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
-
-    setState({ ...state, [side]: open });
-  };
-
-  const sideList = side => (
-    <div
-      className={classes.list}
-      role="presentation"
-      onClick={toggleDrawer(side, false)}
-      onKeyDown={toggleDrawer(side, false)}
-    >
-      <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List>
-    </div>
-  );
-
   const history = useHistory();
   const client = useApolloClient();
+ 
 
   const SignOut = () => {
     localStorage.removeItem('auth-token');
@@ -98,6 +55,17 @@ export default function Header() {
 
   function IsLoggedIn() {
     const { data } = useQuery(IS_LOGGED_IN);
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = event => {
+      setAnchorEl(event.currentTarget)
+      console.log(event.currentTarget)
+    };
+  
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
     return data.isLoggedIn ?
       <React.Fragment>
         <Button
@@ -106,8 +74,26 @@ export default function Header() {
           className={classes.button}
           startIcon={<AddIcon />}
           href="/new-request"
-        >New Request</Button>
-        <Button onClick={SignOut} color="inherit">Sign Out</Button>
+        >New Request</Button>        
+        <Avatar 
+          aria-controls="user-menu"
+          aria-haspopup="true"
+          className={classes.avatar} 
+          src="http://localhost:4000/images/avatars/avatar-0.png"      
+          onClick={handleClick}     
+        />
+        <Menu
+          id="user-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem>Profile</MenuItem>
+          <MenuItem>My Requests</MenuItem>
+          <MenuItem onClick={SignOut}>Sign Out</MenuItem>
+        </Menu>
+
       </React.Fragment>
       :
       <React.Fragment>
@@ -118,18 +104,8 @@ export default function Header() {
 
   return (
     <div className={classes.root}>
-      <AppBar>
-        <SwipeableDrawer
-          open={state.left}
-          onClose={toggleDrawer('left', false)}
-          onOpen={toggleDrawer('left', true)}
-        >
-          {sideList('left')}
-        </SwipeableDrawer>
-        <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} onClick={toggleDrawer('left', true)} color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
+      <AppBar>        
+        <Toolbar>          
           <Typography variant="h6" className={classes.title}>
             <Link color="inherit" underline="none" href="/">Critistry</Link>
           </Typography>
