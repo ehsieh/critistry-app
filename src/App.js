@@ -11,6 +11,7 @@ import Request from "./pages/Request";
 import Post from "./pages/Post";
 import Profile from "./pages/Profile";
 import MyRequests from "./pages/MyRequests";
+import NewPost from "./pages/NewPost";
 
 const App = () => (
   <BrowserRouter>
@@ -23,9 +24,10 @@ const App = () => (
           <Route path="/signup" exact component={SignUp} />
           <Route path="/new-request" exact component={NewRequest} />
           <Route path="/profile" exact component={Profile} />
-          <Route path="/my-requests" exact component={MyRequests} />
-          <Route path="/request/:id" component={Request} />
+          <Route path="/my-requests" exact component={MyRequests} />          
           <Route path="/post/:id" component={Post} />
+          <Route path="/request/:id/new-post" exact component={NewPost} />
+          <Route path="/request/:id" component={Request} />
           <Route component={NotFound} />                   
         </Switch>
       </div>

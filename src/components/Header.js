@@ -90,7 +90,7 @@ export default function Header() {
           onClose={handleClose}
         >
           <MenuItem component={Link} href="/profile">Profile</MenuItem>
-          <MenuItem containerElement={<Link to="/my-requests" />}>My Requests</MenuItem>
+          <MenuItem component={Link} href="/my-requests">My Requests</MenuItem>
           <MenuItem onClick={SignOut}>Sign Out</MenuItem>
         </Menu>
 

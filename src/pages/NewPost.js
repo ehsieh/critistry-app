@@ -3,16 +3,12 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo-hooks';
 import { useParams } from "react-router-dom"
+
+const fabric = require('fabric').fabric;
+
 
 const useStyles = makeStyles(theme => ({
 
@@ -51,6 +47,15 @@ const useStyles = makeStyles(theme => ({
   },
   button: {
     marginTop: theme.spacing(2)
+  },
+  canvas: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    zIndex: 0
+  },
+  canvasContainer: {
+    position: 'relative'
   }
 }));
 
@@ -79,7 +84,22 @@ const GET_CRIT_REQUEST_QUERY = gql`
   }
 `;
 
-export default function Request() {
+export default function NewPost() {
+  const onImageLoad = event => {
+    const img = event.target;
+    var context = document.getElementById('layer1').getContext("2d");
+    var context2 = document.getElementById('layer2').getContext("2d");
+    context.canvas.width  = img.width;
+    context.canvas.height = img.height;
+    context2.canvas.width  = img.width;
+    context2.canvas.height = img.height;
+    context.drawImage(img, 0, 0, img.width, img.height);
+    img.style.display = "none"
+    const canvas = new fabric.Canvas('layer2', {
+          isDrawingMode: true
+    });
+  };
+
   const classes = useStyles();
   const { id } = useParams();
   const { loading, error, data } = useQuery(GET_CRIT_REQUEST_QUERY, {
@@ -93,44 +113,15 @@ export default function Request() {
     <Container component="main" maxWidth="md">
       <CssBaseline />
       <div className={classes.paper}>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <img alt="" className={classes.image} src={data.critRequest.image} />            
-          </Grid>
-          <Grid item xs={6}>
-          <Typography className={classes.title} component="h1" variant="h5">
-            {data.critRequest.title}
-          </Typography>
-            <Typography>
-              {data.critRequest.description}
-            </Typography>
-            <Button
-              variant="contained"
-              color="default"
-              className={classes.button}
-              startIcon={<AddIcon />}
-              href={`/request/${data.critRequest.id}/new-post`}
-            >New Crit</Button>       
-          </Grid>
-        </Grid>
-      </div>                  
-                  
-      {data.critRequest.critPosts.map(p => (
-      <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon/>}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography className={classes.header}>Crit by: {p.user.username}</Typography>          
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Typography>
-            {p.postText}
-          </Typography>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>      
-      ))}
+        <Typography component="h1" variant="h5">
+          {data.critRequest.title}
+        </Typography>
+        <div className={classes.canvasContainer}>
+          <img hide alt="" onLoad={onImageLoad} className={classes.image} src={data.critRequest.image} />        
+          <canvas id="layer1" className={classes.canvas}></canvas>
+          <canvas id="layer2" className={classes.canvas}></canvas>
+        </div>
+      </div>
     </Container>
   );
 }
