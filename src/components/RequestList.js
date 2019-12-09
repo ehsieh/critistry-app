@@ -62,14 +62,18 @@ export function RequestList() {
 
   const getGridListCols = () => {
     if (width === 'xl') {
-      return 4;
+      return 8;
     }
 
     if (width ==='lg') {
-      return 3;
+      return 6;
     }
 
     if (width === 'md') {
+      return 4;
+    }
+
+    if (width === 'sm') {
       return 2;
     }
 
@@ -80,7 +84,7 @@ export function RequestList() {
   if (error) return `Error! ${error.message}`;
   console.log("width: " + width);
   return (    
-    <GridList cellHeight={300} className={classes.gridList} cols={getGridListCols()}>
+    <GridList cellHeight={260} className={classes.gridList} cols={getGridListCols()}>
     {data.critRequests.map(r => (
       <GridListTile key={r.id} cols={1}>
         <img src={r.image} alt={r.title} />

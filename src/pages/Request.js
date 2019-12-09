@@ -3,6 +3,11 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo-hooks';
 import { useParams } from "react-router-dom"
@@ -16,6 +21,7 @@ const useStyles = makeStyles(theme => ({
   },
   paper: {
     marginTop: theme.spacing(12),
+    marginBottom: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -33,6 +39,13 @@ const useStyles = makeStyles(theme => ({
   },
   image: {
     maxWidth: '400px'
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
+  },
+  title: {
+    marginBottom: theme.spacing(2)
   }
 }));
 
@@ -75,14 +88,37 @@ export default function Request() {
     <Container component="main" maxWidth="md">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
-          {data.critRequest.title}
-        </Typography>
-        <img alt="" className={classes.image} src={data.critRequest.image} />
-        <Typography component="h5" variant="h6">
-          {data.critRequest.description}
-        </Typography>
-      </div>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <img alt="" className={classes.image} src={data.critRequest.image} />
+          </Grid>
+          <Grid item xs={6}>
+          <Typography className={classes.title} component="h1" variant="h5">
+            {data.critRequest.title}
+          </Typography>
+            <Typography>
+              {data.critRequest.description}
+            </Typography>
+          </Grid>
+        </Grid>
+      </div>                  
+                  
+      {data.critRequest.critPosts.map(p => (
+      <ExpansionPanel>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon/>}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography className={classes.header}>Crit by: {p.user.username}</Typography>          
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+          <Typography>
+            {p.postText}
+          </Typography>
+        </ExpansionPanelDetails>
+      </ExpansionPanel>      
+      ))}
     </Container>
   );
 }

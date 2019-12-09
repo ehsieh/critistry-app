@@ -89,8 +89,8 @@ export default function Header() {
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
-          <MenuItem>Profile</MenuItem>
-          <MenuItem>My Requests</MenuItem>
+          <MenuItem component={Link} href="/profile">Profile</MenuItem>
+          <MenuItem containerElement={<Link to="/my-requests" />}>My Requests</MenuItem>
           <MenuItem onClick={SignOut}>Sign Out</MenuItem>
         </Menu>
 
