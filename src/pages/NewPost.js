@@ -6,6 +6,10 @@ import Container from '@material-ui/core/Container';
 import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo-hooks';
 import { useParams } from "react-router-dom"
+import { SliderPicker } from 'react-color';
+import Slider from '@material-ui/core/Slider';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 
 const fabric = require('fabric').fabric;
 
@@ -36,7 +40,7 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2),
   },
   image: {
-    maxWidth: '400px'
+    maxWidth: '600px'
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),
@@ -45,8 +49,12 @@ const useStyles = makeStyles(theme => ({
   title: {
     marginBottom: theme.spacing(2)
   },
-  button: {
+  tool: {
     marginTop: theme.spacing(2)
+  },
+  submit: {
+    width: '200px',
+    margin: theme.spacing(3, 0, 2),
   },
   canvas: {
     position: 'absolute',
@@ -85,6 +93,8 @@ const GET_CRIT_REQUEST_QUERY = gql`
 `;
 
 export default function NewPost() {
+  let canvas = null;
+
   const onImageLoad = event => {
     const img = event.target;
     var context = document.getElementById('layer1').getContext("2d");
@@ -95,9 +105,20 @@ export default function NewPost() {
     context2.canvas.height = img.height;
     context.drawImage(img, 0, 0, img.width, img.height);
     img.style.display = "none"
-    const canvas = new fabric.Canvas('layer2', {
+    canvas = new fabric.Canvas('layer2', {
           isDrawingMode: true
     });
+    canvas.freeDrawingBrush.color = '#22194d';
+    canvas.freeDrawingBrush.width = 4;
+  };
+
+  const handleColorChange = (color) => {
+    canvas.freeDrawingBrush.color = color.hex;    
+    console.log(color.hex);
+  };
+
+  const handleBrushSizeChange = (event, value) => {
+    canvas.freeDrawingBrush.width = value;    
   };
 
   const classes = useStyles();
@@ -113,14 +134,60 @@ export default function NewPost() {
     <Container component="main" maxWidth="md">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
+        <Typography className={classes.title} component="h1" variant="h5">
           {data.critRequest.title}
         </Typography>
         <div className={classes.canvasContainer}>
           <img hide alt="" onLoad={onImageLoad} className={classes.image} src={data.critRequest.image} />        
           <canvas id="layer1" className={classes.canvas}></canvas>
           <canvas id="layer2" className={classes.canvas}></canvas>
+          <div className={classes.tool}>
+          <Typography>
+            Brush Color
+          </Typography>
+          <SliderPicker
+            onChangeComplete={ handleColorChange }
+          />          
+          </div>
+          <div className={classes.tool}>
+          <Typography>
+            Brush Size
+          </Typography>
+          <Slider
+            defaultValue={4}
+            aria-labelledby="discrete-slider"
+            valueLabelDisplay="auto"
+            step={1}
+            marks
+            min={1}
+            max={20}
+            onChange={handleBrushSizeChange}
+          />
+          </div>
         </div>
+
+        <TextField
+          className={classes.tool}
+          variant="outlined"
+          required
+          fullWidth
+          multiline
+          rows="10"
+          id="postText"
+          label="Your Crit"
+          name="postText"                              
+        />
+
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          className={classes.submit}
+        >
+          Submit
+        </Button>
+        
       </div>
     </Container>
   );

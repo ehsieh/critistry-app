@@ -13,6 +13,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo-hooks';
 import { useParams } from "react-router-dom"
+import Loading from "../components/Loading"
 
 const useStyles = makeStyles(theme => ({
 
@@ -86,7 +87,7 @@ export default function Request() {
     variables: { "id": id }
   });
 
-  if (loading) return 'Loading...';
+  if (loading) return (<Loading/>);
   if (error) return `Error! ${error.message}`;
   console.log(data);
   return (

@@ -8,6 +8,7 @@ import GridList from '@material-ui/core/GridList';
 import Link from '@material-ui/core/Link';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
+import Loading from "./Loading"
 
 const GET_REQUESTS = gql`
 {
@@ -80,7 +81,7 @@ export function RequestList() {
     return 1;
   }
 
-  if (loading) return 'Loading...';
+  if (loading) return (<Loading/>);
   if (error) return `Error! ${error.message}`;
   console.log("width: " + width);
   return (    
