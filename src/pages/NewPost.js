@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -10,9 +10,10 @@ import { SliderPicker } from 'react-color';
 import Slider from '@material-ui/core/Slider';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import { useMutation } from 'react-apollo-hooks';
+import Loading from "../components/Loading"
 
 const fabric = require('fabric').fabric;
-
 
 const useStyles = makeStyles(theme => ({
 
@@ -36,11 +37,8 @@ const useStyles = makeStyles(theme => ({
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
   image: {
-    maxWidth: '600px'
+    maxWidth: '800px'
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),
@@ -71,28 +69,27 @@ const GET_CRIT_REQUEST_QUERY = gql`
   query GetCritRequest($id: String!) {
     critRequest(id: $id) {
       id
-      title
-      description
-      image
-      critPosts
-      {
-        id
-        postText
-        user
-        {
-          username
-        }
-      }
+      title      
+      image      
       user
-      {
-        id
+      {        
         username
       }
     }
   }
 `;
 
-export default function NewPost() {
+const NEW_POST_MUTATION = gql`
+  mutation createCritPost($postText: String!, $annotation: String!, $critRequestId: ID!) {
+    createCritPost(postText: $postText, annotation: $annotation, critRequestId: $critRequestId) {      
+      id
+      postText
+      annotation
+    }
+  }
+`;
+
+export default function NewPost() {  
   let canvas = null;
 
   const onImageLoad = event => {
@@ -113,12 +110,23 @@ export default function NewPost() {
   };
 
   const handleColorChange = (color) => {
-    canvas.freeDrawingBrush.color = color.hex;    
-    console.log(color.hex);
+    canvas.freeDrawingBrush.color = color.hex;        
   };
 
   const handleBrushSizeChange = (event, value) => {
     canvas.freeDrawingBrush.width = value;    
+  };
+
+  const handleClearCanvas = (event, value) => {
+    canvas.clear();
+  };
+
+  const handlePostTextChange = event => {
+    console.log(event.target.value)
+    setNewCrit({
+      ...newCrit,
+      postText: event.target.value
+    })    
   };
 
   const classes = useStyles();
@@ -127,12 +135,19 @@ export default function NewPost() {
     variables: { "id": id }
   });
 
-  if (loading) return 'Loading...';
+  const [create_new_post, { newCritData }] = useMutation(NEW_POST_MUTATION);
+  const [newCrit, setNewCrit] = useState({
+    postText: "",
+    annotation: "",
+    critRequestId: id
+  })
+
+  if (loading) return (<Loading/>);
   if (error) return `Error! ${error.message}`;
-  console.log(data);
+  
   return (
     <Container component="main" maxWidth="md">
-      <CssBaseline />
+      <CssBaseline />      
       <div className={classes.paper}>
         <Typography className={classes.title} component="h1" variant="h5">
           {data.critRequest.title}
@@ -142,27 +157,37 @@ export default function NewPost() {
           <canvas id="layer1" className={classes.canvas}></canvas>
           <canvas id="layer2" className={classes.canvas}></canvas>
           <div className={classes.tool}>
-          <Typography>
-            Brush Color
-          </Typography>
-          <SliderPicker
-            onChangeComplete={ handleColorChange }
-          />          
+            <Typography>
+              Brush Color
+            </Typography>
+            <SliderPicker
+              onChangeComplete={ handleColorChange }
+            />          
           </div>
           <div className={classes.tool}>
-          <Typography>
-            Brush Size
-          </Typography>
-          <Slider
-            defaultValue={4}
-            aria-labelledby="discrete-slider"
-            valueLabelDisplay="auto"
-            step={1}
-            marks
-            min={1}
-            max={20}
-            onChange={handleBrushSizeChange}
-          />
+            <Typography>
+              Brush Size
+            </Typography>
+            <Slider
+              defaultValue={4}
+              aria-labelledby="discrete-slider"
+              valueLabelDisplay="auto"
+              step={1}
+              marks
+              min={1}
+              max={30}
+              onChange={handleBrushSizeChange}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={handleClearCanvas}
+            >
+              Clear Canvas
+            </Button>
           </div>
         </div>
 
@@ -175,7 +200,9 @@ export default function NewPost() {
           rows="10"
           id="postText"
           label="Your Crit"
-          name="postText"                              
+          name="postText"                        
+          value={newCrit.postText}      
+          onChange={handlePostTextChange}
         />
 
         <Button
