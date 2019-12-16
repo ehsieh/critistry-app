@@ -6,14 +6,17 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo-hooks';
 import { useParams } from "react-router-dom"
 import Loading from "../components/Loading"
+import Avatar from '@material-ui/core/Avatar';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Divider from '@material-ui/core/Divider';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const useStyles = makeStyles(theme => ({
 
@@ -30,8 +33,10 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
   },
   avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    width: '70px',
+    height: '70px',
+    margin: theme.spacing(2),    
+    backgroundColor: theme.palette.background.paper,
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -52,7 +57,17 @@ const useStyles = makeStyles(theme => ({
   },
   button: {
     marginTop: theme.spacing(2)
-  }
+  },  
+  list: {
+    width: '100%',    
+    backgroundColor: theme.palette.background.paper,
+  },
+  inline: {
+    display: 'inline',
+  },
+  postTitle: {
+    color: theme.palette.primary.main
+  },
 }));
 
 const GET_CRIT_REQUEST_QUERY = gql`
@@ -69,6 +84,7 @@ const GET_CRIT_REQUEST_QUERY = gql`
         user
         {
           username
+          avatar
         }
       }
       user
@@ -81,6 +97,9 @@ const GET_CRIT_REQUEST_QUERY = gql`
 `;
 
 export default function Request() {
+
+  const truncate = (input, max) => input.length > max ? `${input.substring(0, max)}...` : input;
+
   const classes = useStyles();
   const { id } = useParams();
   const { loading, error, data } = useQuery(GET_CRIT_REQUEST_QUERY, {
@@ -115,23 +134,26 @@ export default function Request() {
           </Grid>
         </Grid>
       </div>                  
-                  
-      {data.critRequest.critPosts.map(p => (
-      <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon/>}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography className={classes.header}>Crit by: {p.user.username}</Typography>          
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Typography>
-            {p.postText}
-          </Typography>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>      
-      ))}
+      <List className={classes.list}>
+        {data.critRequest.critPosts.map(p => (
+          <React.Fragment>
+            <Divider component="li" />
+            <Tooltip title="Click to view post details">
+            <ListItem component="a" href={`/post/${p.id}`}>
+              <ListItemAvatar>
+                <Avatar className={classes.avatar} src={p.user.avatar} />
+              </ListItemAvatar>
+              <ListItemText
+                primary={
+                  <Typography className={classes.postTitle}>{p.user.username}</Typography>                
+                }
+                secondary={truncate(p.postText, 300)}
+              />                            
+            </ListItem>               
+            </Tooltip>
+          </React.Fragment>     
+        ))}
+      </List>                      
     </Container>
   );
 }
