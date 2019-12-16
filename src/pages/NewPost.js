@@ -12,6 +12,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { useMutation } from 'react-apollo-hooks';
 import Loading from "../components/Loading"
+import { useHistory } from "react-router-dom";
 
 const fabric = require('fabric').fabric;
 
@@ -130,6 +131,7 @@ export default function NewPost() {
   };
 
   const classes = useStyles();
+  const history = useHistory();
   const { id } = useParams();
   const { loading, error, data } = useQuery(GET_CRIT_REQUEST_QUERY, {
     variables: { "id": id }
@@ -211,6 +213,26 @@ export default function NewPost() {
           variant="contained"
           color="primary"
           className={classes.submit}
+          onClick={e => {
+            console.log(newCrit);
+            e.preventDefault();
+            create_new_post({
+              variables:
+              {
+                postText: newCrit.postText,
+                annotation: newCrit.annotation,
+                critRequestId: newCrit.critRequestId
+              }
+            })
+              .then((result) => {
+                console.log(result);       
+                history.push("/request/" + id)         
+              })
+              .catch(error => {
+                console.log(error.graphQLErrors);
+                //handleErrors(error.graphQLErrors);
+              });
+          }}
         >
           Submit
         </Button>

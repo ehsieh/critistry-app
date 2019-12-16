@@ -138,7 +138,7 @@ export default function Request() {
         {data.critRequest.critPosts.map(p => (
           <React.Fragment>
             <Divider component="li" />
-            <Tooltip title="Click to view post details">
+            <Tooltip title={`Click to view full crit from ${p.user.username}`}>
             <ListItem component="a" href={`/post/${p.id}`}>
               <ListItemAvatar>
                 <Avatar className={classes.avatar} src={p.user.avatar} />

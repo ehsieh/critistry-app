@@ -40,8 +40,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function SignUpForm() {
   const SIGNUP_MUTATION = gql`
-  mutation SignUp($username: String!, $email: String!, $password: String!) {
-    signup(username: $username, email: $email, password: $password) {
+  mutation SignUp($username: String!, $email: String!, $password: String!, $avatar: String!) {
+    signup(username: $username, email: $email, password: $password, avatar: $avatar) {
       token
       user {
         username
@@ -60,7 +60,8 @@ export default function SignUpForm() {
     password: "",
     usernameError: null,
     emailError: null,
-    passwordError: null
+    passwordError: null,
+    avatar: "http://localhost:4000/images/avatars/avatar-0.png"
   })
 
   const handleChange = name => event => {
@@ -126,7 +127,8 @@ export default function SignUpForm() {
               {
                 username: user.username,
                 email: user.email,
-                password: user.password
+                password: user.password,
+                avatar: user.avatar
               }
             })
               .then((result) => {
