@@ -12,6 +12,13 @@ import Container from '@material-ui/core/Container';
 import gql from 'graphql-tag';
 import { useMutation, useApolloClient } from 'react-apollo-hooks';
 import { useHistory } from "react-router-dom";
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
+import List from '@material-ui/core/List';
+import IconButton from '@material-ui/core/IconButton';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemText from '@material-ui/core/ListItemText';
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -20,14 +27,19 @@ const useStyles = makeStyles(theme => ({
     },
   },
   paper: {
-    marginTop: theme.spacing(8),
+    marginTop: theme.spacing(10),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
   avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    margin: theme.spacing(2),    
+    width: '120px',
+    height: '120px'
+  },
+  avatarSmall: {    
+    width: '70px',
+    height: '70px'
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -45,6 +57,7 @@ export default function SignUpForm() {
       token
       user {
         username
+        avatar
       }
     }
   }
@@ -61,8 +74,32 @@ export default function SignUpForm() {
     usernameError: null,
     emailError: null,
     passwordError: null,
-    avatar: "http://localhost:4000/images/avatars/avatar-0.png"
+    avatar: "http://localhost:4000/images/avatars/avatar-0.png",
+    avatarPickerOpen: false
   })
+
+  const handleAvatarPickerOpen = () => {
+    setUser({
+      ...user,
+      avatarPickerOpen: true
+    })
+  };
+
+  const handleAvatarPickerClose = () => {
+    setUser({
+      ...user,
+      avatarPickerOpen: false
+    })
+  };
+
+  const handleAvatarClick = (avatar) => {
+    setUser({
+      ...user,
+      avatar: avatar,
+      avatarPickerOpen: false
+    })
+  };
+
 
   const handleChange = name => event => {
     setUser({
@@ -110,13 +147,53 @@ export default function SignUpForm() {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
+
+      <Dialog
+        onClose={handleAvatarPickerClose}
+        aria-labelledby="avatar-picker" 
+        open={user.avatarPickerOpen}>
+          <DialogTitle id="avatar-picker">Pick your avatar</DialogTitle>            
+          <List>
+            {['http://localhost:4000/images/avatars/avatar-0.png',
+              'http://localhost:4000/images/avatars/avatar-48.png',
+              'http://localhost:4000/images/avatars/avatar-234.png',
+              'http://localhost:4000/images/avatars/avatar-239.png',
+              'http://localhost:4000/images/avatars/avatar-208.png',
+              'http://localhost:4000/images/avatars/avatar-216.png'            
+             ].map(avatar => (
+               <Grid 
+                container
+                direction="row"
+                justify="center"
+                alignItems="center">
+                  <Grid item>
+                    <IconButton onClick={() => handleAvatarClick(avatar)}>
+                      <Avatar className={classes.avatarSmall} src={avatar} />
+                    </IconButton>
+                  </Grid>
+                </Grid>               
+             ))
+
+            }
+          </List>
+      </Dialog>
+
+      <div className={classes.paper}>        
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
+
+        <Avatar 
+          className={classes.avatar} 
+          src={user.avatar}
+        />
+        <Button 
+          variant="contained"
+          color="primary"
+          onClick={handleAvatarPickerOpen}
+        >
+            Change Avatar
+        </Button>
         <form
           className={classes.form}
           noValidate
@@ -132,7 +209,7 @@ export default function SignUpForm() {
               }
             })
               .then((result) => {
-                console.log(result.data.signup.token);
+                console.log(result.data.signup.token);                
                 localStorage.setItem('auth-token', result.data.signup.token);
                 client.writeData({ data: { isLoggedIn: true } });
                 history.push('/');
