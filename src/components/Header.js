@@ -13,6 +13,8 @@ import { useQuery } from "react-apollo-hooks";
 import gql from "graphql-tag";
 import { useApolloClient } from 'react-apollo-hooks';
 import { useHistory } from "react-router-dom";
+import LoggedOutMenu from "./LoggedOutMenu";
+import LoggedInMenu from "./LoggedInMenu";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -43,64 +45,7 @@ const IS_LOGGED_IN = gql`
 
 export default function Header() {
   const classes = useStyles();
-  const history = useHistory();
-  const client = useApolloClient();
- 
-
-  const SignOut = () => {
-    localStorage.removeItem('auth-token');
-    client.writeData({ data: { isLoggedIn: false } });
-    history.push('/');
-  }
-
-  function IsLoggedIn() {
-    const { data } = useQuery(IS_LOGGED_IN);
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const handleClick = event => {
-      setAnchorEl(event.currentTarget)
-      console.log(event.currentTarget)
-    };
-  
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
-
-    return data.isLoggedIn ?
-      <React.Fragment>
-        <Button
-          variant="contained"
-          color="default"
-          className={classes.button}
-          startIcon={<AddIcon />}
-          href="/new-request"
-        >New Request</Button>        
-        <Avatar 
-          aria-controls="user-menu"
-          aria-haspopup="true"
-          className={classes.avatar} 
-          src="http://localhost:4000/images/avatars/avatar-0.png"      
-          onClick={handleClick}     
-        />
-        <Menu
-          id="user-menu"
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem component={Link} href="/profile">Profile</MenuItem>
-          <MenuItem component={Link} href="/my-requests">My Requests</MenuItem>
-          <MenuItem onClick={SignOut}>Sign Out</MenuItem>
-        </Menu>
-
-      </React.Fragment>
-      :
-      <React.Fragment>
-        <Button href="/signin" color="inherit">Sign In</Button>
-        <Button href="/signup" color="inherit">Sign Up</Button>
-      </React.Fragment>
-  }
+  const { data } = useQuery(IS_LOGGED_IN);
 
   return (
     <div className={classes.root}>
@@ -109,7 +54,7 @@ export default function Header() {
           <Typography variant="h6" className={classes.title}>
             <Link color="inherit" underline="none" href="/">Critistry</Link>
           </Typography>
-          <IsLoggedIn />
+          {data.isLoggedIn ? <LoggedInMenu/> : <LoggedOutMenu/>}
         </Toolbar>
       </AppBar>
     </div>
