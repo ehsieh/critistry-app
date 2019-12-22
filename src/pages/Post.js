@@ -32,7 +32,22 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2),
   },
   image: {
-    width: '700px'
+    maxWidth: '700px'
+  },
+  canvas: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    zIndex: 0
+  },
+  canvasContainer: {
+    position: 'relative'
+  },
+  title: {
+    marginBottom: theme.spacing(2)
+  },
+  postText: {
+    marginTop: theme.spacing(2)
   }
 }));
 
@@ -57,11 +72,30 @@ const GET_CRIT_POST_QUERY = gql`
 `;
 
 export default function Post() {
+
   const classes = useStyles();
   const { id } = useParams();
   const { loading, error, data } = useQuery(GET_CRIT_POST_QUERY, {
     variables: { "id": id }
   });
+
+  const fabric = require('fabric').fabric;
+
+  const onImageLoad = event => {
+    const img = event.target;
+    var context = document.getElementById('layer1').getContext("2d");
+    var context2 = document.getElementById('layer2').getContext("2d");
+    context.canvas.width  = img.width;
+    context.canvas.height = img.height;
+    context2.canvas.width  = img.width;
+    context2.canvas.height = img.height;
+    context.drawImage(img, 0, 0, img.width, img.height);
+    img.style.display = "none";
+    const canvas = new fabric.Canvas('layer2', {
+        isDrawingMode: true
+    })
+    canvas.loadFromJSON(data.critPost.annotation);
+  };
 
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
@@ -70,16 +104,17 @@ export default function Post() {
     <Container component="main" maxWidth="md">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
+        <Typography className={classes.title} component="h1" variant="h5">
           {data.critPost.critRequest.title}
         </Typography>
-        <img alt="" class={classes.image} src={data.critPost.critRequest.image} />
-        <Typography component="h5" variant="h6">
+        <div className={classes.canvasContainer}>
+          <img hide alt="" onLoad={onImageLoad} className={classes.image} src={data.critPost.critRequest.image} />        
+          <canvas id="layer1" className={classes.canvas}></canvas>
+          <canvas id="layer2" className={classes.canvas}></canvas>
+        </div>
+        <Typography className={classes.postText} component="h5" variant="h6">
           {data.critPost.postText}
-        </Typography>
-        <Typography component="h5" variant="h6">
-          {data.critPost.annotation}
-        </Typography>
+        </Typography>        
       </div>
     </Container>
   );
