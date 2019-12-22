@@ -8,7 +8,7 @@ import * as serviceWorker from "./serviceWorker";
 
 // GraphQL-specific
 import { ApolloClient } from "apollo-boost";
-import { ApolloProvider } from "react-apollo-hooks"
+import { ApolloProvider } from "@apollo/react-hooks"
 import { resolvers, typeDefs } from "./Resolvers";
 
 

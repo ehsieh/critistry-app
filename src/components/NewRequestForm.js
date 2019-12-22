@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import gql from 'graphql-tag';
-import { useMutation } from 'react-apollo-hooks';
+import { useMutation } from '@apollo/react-hooks';
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     },
   },
   paper: {
-    marginTop: theme.spacing(8),
+    marginTop: theme.spacing(12),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -51,7 +51,11 @@ export default function NewRequestFrom() {
 
   const history = useHistory();
   const classes = useStyles();
-  const [create_new_request, { data }] = useMutation(NEW_REQUEST_MUTATION);
+  const [create_new_request, { data }] = useMutation(NEW_REQUEST_MUTATION, {
+    onCompleted: (data) => {      
+      history.push('/');
+    }
+  });
   const [request, setRequest] = useState({
     title: "",
     description: "",
@@ -77,10 +81,7 @@ export default function NewRequestFrom() {
   return (
     <Container component="main" maxWidth="md">
       <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <AddCircleOutlineIcon />
-        </Avatar>
+      <div className={classes.paper}>        
         <Typography component="h1" variant="h5">
           Create Crit Request
         </Typography>
@@ -97,15 +98,7 @@ export default function NewRequestFrom() {
                 description: request.description,
                 image: request.image
               }
-            })
-              .then((result) => {
-                console.log(result);
-                history.push('/');
-              })
-              .catch(error => {
-                console.log(error.graphQLErrors);
-                //handleErrors(error.graphQLErrors);
-              });
+            })             
           }}
         >
           <Grid container spacing={2}>

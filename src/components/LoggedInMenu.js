@@ -8,9 +8,9 @@ import AddIcon from '@material-ui/icons/Add';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Link from '@material-ui/core/Link';
-import { useApolloClient } from 'react-apollo-hooks';
+import { useApolloClient } from '@apollo/react-hooks';
 import { useHistory } from "react-router-dom";
-import { useQuery } from "react-apollo-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 const useStyles = makeStyles(theme => ({
@@ -79,13 +79,12 @@ export function LoggedInMenu() {
           startIcon={<AddIcon />}
           href="/new-request"
         >New Request</Button>        
-        <IconButton className={classes.avatarButton} >
+        <IconButton className={classes.avatarButton} onClick={handleClick}>
           <Avatar 
             aria-controls="user-menu"
             aria-haspopup="true"     
             className={classes.avatar}       
-            src={data.me.avatar}
-            onClick={handleClick}     
+            src={data.me.avatar}            
           />
         </IconButton>
         <Menu

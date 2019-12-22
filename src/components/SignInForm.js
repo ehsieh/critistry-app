@@ -10,7 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import gql from "graphql-tag";
-import { useMutation, useApolloClient } from 'react-apollo-hooks';
+import { useMutation, useApolloClient } from '@apollo/react-hooks';
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
@@ -53,7 +53,14 @@ export default function SignInForm() {
   const classes = useStyles();
   const history = useHistory();
   const client = useApolloClient();
-  const [signIn, { data }] = useMutation(SIGNIN_MUTATION);
+  const [signIn, { data }] = useMutation(SIGNIN_MUTATION, {
+    onCompleted: (data) => {
+      console.log(data.signup.token);                
+      localStorage.setItem('auth-token', data.signin.token);
+      client.writeData({ data: { isLoggedIn: true } });
+      history.push('/');
+    }
+  });
   const [user, setUser] = useState({
     username: "",
     password: "",
@@ -114,16 +121,7 @@ export default function SignInForm() {
                 username: user.username,
                 password: user.password
               }
-            })
-              .then((result) => {
-                console.log(result.data.signin.token);
-                localStorage.setItem('auth-token', result.data.signin.token);
-                client.writeData({ data: { isLoggedIn: true } });
-                history.push('/');
-              })
-              .catch(error => {
-                handleErrors(error.graphQLErrors);
-              });
+            })             
           }}
         >
           <TextField

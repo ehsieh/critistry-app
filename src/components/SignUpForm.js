@@ -10,15 +10,9 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import gql from 'graphql-tag';
-import { useMutation, useApolloClient } from 'react-apollo-hooks';
+import { useMutation, useApolloClient } from '@apollo/react-hooks';
 import { useHistory } from "react-router-dom";
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
-import List from '@material-ui/core/List';
-import IconButton from '@material-ui/core/IconButton';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemText from '@material-ui/core/ListItemText';
+import AvatarPicker from "./AvatarPicker";
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -66,7 +60,14 @@ export default function SignUpForm() {
   const history = useHistory();
   const classes = useStyles();
   const client = useApolloClient();
-  const [signUp, { data }] = useMutation(SIGNUP_MUTATION);
+  const [signUp, { data }] = useMutation(SIGNUP_MUTATION, {
+    onCompleted: (data) => {
+      console.log(data.signup.token);                
+      localStorage.setItem('auth-token', data.signup.token);
+      client.writeData({ data: { isLoggedIn: true } });
+      history.push('/');
+    }
+  });
   const [user, setUser] = useState({
     username: "",
     email: "",
@@ -74,39 +75,21 @@ export default function SignUpForm() {
     usernameError: null,
     emailError: null,
     passwordError: null,
-    avatar: "http://localhost:4000/images/avatars/avatar-0.png",
-    avatarPickerOpen: false
+    avatar: "",    
   })
-
-  const handleAvatarPickerOpen = () => {
-    setUser({
-      ...user,
-      avatarPickerOpen: true
-    })
-  };
-
-  const handleAvatarPickerClose = () => {
-    setUser({
-      ...user,
-      avatarPickerOpen: false
-    })
-  };
-
-  const handleAvatarClick = (avatar) => {
-    setUser({
-      ...user,
-      avatar: avatar,
-      avatarPickerOpen: false
-    })
-  };
-
 
   const handleChange = name => event => {
     setUser({
       ...user,
       [name]: event.target.value
-    }
-    );
+    });
+  };
+
+  const handleAvatarSelected = avatar => {    
+    setUser({
+      ...user,
+      avatar: avatar
+    });    
   };
 
   const isFormValid = event => {
@@ -146,54 +129,14 @@ export default function SignUpForm() {
 
   return (
     <Container component="main" maxWidth="xs">
-      <CssBaseline />
-
-      <Dialog
-        onClose={handleAvatarPickerClose}
-        aria-labelledby="avatar-picker" 
-        open={user.avatarPickerOpen}>
-          <DialogTitle id="avatar-picker">Pick your avatar</DialogTitle>            
-          <List>
-            {['http://localhost:4000/images/avatars/avatar-0.png',
-              'http://localhost:4000/images/avatars/avatar-48.png',
-              'http://localhost:4000/images/avatars/avatar-234.png',
-              'http://localhost:4000/images/avatars/avatar-239.png',
-              'http://localhost:4000/images/avatars/avatar-208.png',
-              'http://localhost:4000/images/avatars/avatar-216.png'            
-             ].map(avatar => (
-               <Grid 
-                container
-                direction="row"
-                justify="center"
-                alignItems="center">
-                  <Grid item>
-                    <IconButton onClick={() => handleAvatarClick(avatar)}>
-                      <Avatar className={classes.avatarSmall} src={avatar} />
-                    </IconButton>
-                  </Grid>
-                </Grid>               
-             ))
-
-            }
-          </List>
-      </Dialog>
+      <CssBaseline />      
 
       <div className={classes.paper}>        
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
 
-        <Avatar 
-          className={classes.avatar} 
-          src={user.avatar}
-        />
-        <Button 
-          variant="contained"
-          color="primary"
-          onClick={handleAvatarPickerOpen}
-        >
-            Change Avatar
-        </Button>
+        <AvatarPicker onAvatarSelected={handleAvatarSelected}/>
         <form
           className={classes.form}
           noValidate
@@ -207,16 +150,7 @@ export default function SignUpForm() {
                 password: user.password,
                 avatar: user.avatar
               }
-            })
-              .then((result) => {
-                console.log(result.data.signup.token);                
-                localStorage.setItem('auth-token', result.data.signup.token);
-                client.writeData({ data: { isLoggedIn: true } });
-                history.push('/');
-              })
-              .catch(error => {
-                handleErrors(error.graphQLErrors);
-              });
+            })              
           }}
         >
           <Grid container spacing={2}>
