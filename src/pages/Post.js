@@ -41,6 +41,7 @@ const GET_CRIT_POST_QUERY = gql`
     critPost(id: $id) {
       id
       postText
+      annotation
       critRequest
       {
         id
@@ -75,6 +76,9 @@ export default function Post() {
         <img alt="" class={classes.image} src={data.critPost.critRequest.image} />
         <Typography component="h5" variant="h6">
           {data.critPost.postText}
+        </Typography>
+        <Typography component="h5" variant="h6">
+          {data.critPost.annotation}
         </Typography>
       </div>
     </Container>

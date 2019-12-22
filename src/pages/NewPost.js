@@ -91,7 +91,7 @@ const NEW_POST_MUTATION = gql`
 `;
 
 export default function NewPost() {  
-  let canvas = null;
+  //let canvas = null;
 
   const onImageLoad = event => {
     const img = event.target;
@@ -102,46 +102,70 @@ export default function NewPost() {
     context2.canvas.width  = img.width;
     context2.canvas.height = img.height;
     context.drawImage(img, 0, 0, img.width, img.height);
-    img.style.display = "none"
-    canvas = new fabric.Canvas('layer2', {
-          isDrawingMode: true
-    });
-    canvas.freeDrawingBrush.color = '#22194d';
-    canvas.freeDrawingBrush.width = 4;
+    img.style.display = "none";
+    newCrit.canvas = new fabric.Canvas('layer2', {
+        isDrawingMode: true
+    })
+    
+    //canvas = new fabric.Canvas('layer2', {
+    //     isDrawingMode: true
+    //});
+    newCrit.canvas.freeDrawingBrush.color = '#22194d';
+    newCrit.canvas.freeDrawingBrush.width = 4;
   };
 
   const handleColorChange = (color) => {
-    canvas.freeDrawingBrush.color = color.hex;        
+    newCrit.canvas.freeDrawingBrush.color = color.hex;        
   };
 
   const handleBrushSizeChange = (event, value) => {
-    canvas.freeDrawingBrush.width = value;    
+    newCrit.canvas.freeDrawingBrush.width = value;    
   };
 
   const handleClearCanvas = (event, value) => {
-    canvas.clear();
+    console.log(JSON.stringify(newCrit.canvas));
+    newCrit.canvas.clear();
   };
 
-  const handlePostTextChange = event => {
-    console.log(event.target.value)
+  const handlePostTextChange = event => {    
     setNewCrit({
       ...newCrit,
       postText: event.target.value
     })    
   };
 
+  const submitNewPost = (event, value) => {
+    console.log(JSON.stringify(newCrit.canvas));
+    
+    //e.preventDefault();
+    
+    create_new_post({
+      variables:
+      {
+        postText: newCrit.postText,
+        annotation: JSON.stringify(newCrit.canvas),
+        critRequestId: newCrit.critRequestId
+      }
+    })
+  }
+
   const classes = useStyles();
   const history = useHistory();
   const { id } = useParams();
   const { loading, error, data } = useQuery(GET_CRIT_REQUEST_QUERY, {
-    variables: { "id": id }
+    variables: { "id": id },    
   });
 
-  const [create_new_post, { newCritData }] = useMutation(NEW_POST_MUTATION);
+  const [create_new_post, { newCritData }] = useMutation(NEW_POST_MUTATION, {
+    onCompleted: (data) => {
+      history.push("/request/" + id)         
+    }
+  });
   const [newCrit, setNewCrit] = useState({
     postText: "",
     annotation: "",
-    critRequestId: id
+    critRequestId: id,
+    canvas: null
   })
 
   if (loading) return (<Loading/>);
@@ -213,26 +237,7 @@ export default function NewPost() {
           variant="contained"
           color="primary"
           className={classes.submit}
-          onClick={e => {
-            console.log(newCrit);
-            e.preventDefault();
-            create_new_post({
-              variables:
-              {
-                postText: newCrit.postText,
-                annotation: newCrit.annotation,
-                critRequestId: newCrit.critRequestId
-              }
-            })
-              .then((result) => {
-                console.log(result);       
-                history.push("/request/" + id)         
-              })
-              .catch(error => {
-                console.log(error.graphQLErrors);
-                //handleErrors(error.graphQLErrors);
-              });
-          }}
+          onClick={submitNewPost}
         >
           Submit
         </Button>
