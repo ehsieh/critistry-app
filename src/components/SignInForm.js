@@ -55,7 +55,7 @@ export default function SignInForm() {
   const client = useApolloClient();
   const [signIn, { data }] = useMutation(SIGNIN_MUTATION, {
     onCompleted: (data) => {
-      console.log(data.signup.token);                
+      console.log(data.signin.token);                
       localStorage.setItem('auth-token', data.signin.token);
       client.writeData({ data: { isLoggedIn: true } });
       history.push('/');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -8,9 +8,15 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper';
+import ImageOutlinedIcon from '@material-ui/icons/ImageOutlined';
+import ImageSearchOutlinedIcon from '@material-ui/icons/ImageSearchOutlined';
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks';
 import { useHistory } from "react-router-dom";
+import { useDropzone } from "react-dropzone";
+import Cropper from 'react-cropper';
+import 'cropperjs/dist/cropper.css';
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -34,6 +40,28 @@ const useStyles = makeStyles(theme => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
+  },  
+  upload: {
+    width: '300px',
+    height: '300px',
+    textAlign: 'center'
+  },
+  image: {
+    maxWidth: '700px'
+  },
+  icon: {
+    width: '100px',
+    height: '100px',
+    marginTop: theme.spacing(7),
+    marginLeft: theme.spacing(2)
+  },
+  title: {
+    marginBottom: theme.spacing(2)
+  },
+  description: {    
+  },
+  input: {
+    display: 'none',
   },
 }));
 
@@ -59,7 +87,10 @@ export default function NewRequestFrom() {
   const [request, setRequest] = useState({
     title: "",
     description: "",
-    image: ""
+    hasImage: false,    
+    image: null,    
+    imageData: null,
+    thumbnail:null
   })
 
   const handleChange = name => event => {
@@ -74,8 +105,32 @@ export default function NewRequestFrom() {
     return (
       request.title.length > 0 &&
       request.description.length > 0 &&
-      request.image.length > 0
+      request.image != null
     );
+  };
+
+  const onDrop = useCallback(files => {        
+    const reader = new FileReader();
+    reader.onloadend = (e) => {
+      setRequest({
+        ...request,
+        imageData: reader.result,
+        hasImage: true,
+        image: files[0]
+      });      
+    };    
+    reader.readAsDataURL(files[0]);
+  }, [request]);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
+  const cropper = useRef(null);
+
+  const onCrop = () => {        
+    const img = cropper.current.getCroppedCanvas().toDataURL("image/jpeg", 0.7);    
+    setRequest({
+      ...request,
+      thumbnail: img
+    })    
   };
 
   return (
@@ -91,6 +146,7 @@ export default function NewRequestFrom() {
           onSubmit={e => {
             console.log(request);
             e.preventDefault();
+            /*
             create_new_request({
               variables:
               {
@@ -98,11 +154,11 @@ export default function NewRequestFrom() {
                 description: request.description,
                 image: request.image
               }
-            })             
+            })*/             
           }}
         >
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+          <Grid item xs={8}>
               <TextField
                 name="title"
                 variant="outlined"
@@ -111,41 +167,77 @@ export default function NewRequestFrom() {
                 id="title"
                 label="Title"
                 value={request.title}
+                className={classes.title}
                 onChange={handleChange('title')}
-                autoFocus
-              //error={user.usernameError != null}
-              //helperText={user.usernameError}
+                autoFocus              
               />
-            </Grid>
-            <Grid item xs={12}>
               <TextField
                 variant="outlined"
                 required
                 fullWidth
                 multiline
-                rows="5"
+                rows="12"
                 id="description"
                 label="Description"
                 name="description"
                 value={request.description}
-                onChange={handleChange('description')}
-              //error={user.emailError != null}
-              //helperText={user.emailError}
-              />
+                className={classes.description}
+                onChange={handleChange('description')}     
+              />       
             </Grid>
+            <Grid item xs={4}>
+              <div>
+                <Paper className={classes.upload} elevation={2}>
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  {isDragActive ? (
+                    <ImageOutlinedIcon className={classes.icon}/>
+                  ) : (
+                    <ImageSearchOutlinedIcon className={classes.icon}/>
+                  )}
+                </div>
+                <Typography>
+                  Drag and drop your image here or
+                </Typography>
+                <input
+                  accept="image/*"
+                  className={classes.input}
+                  id="button-file"
+                  type="file"
+                />
+                <label htmlFor="button-file">
+                  <Button
+                    component="span"
+                    variant="contained"
+                    color="primary"                                    
+                  >
+                    Browse for image
+                  </Button>
+                </label>
+                </Paper>
+              </div>                            
+            </Grid>                         
             <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                name="image"
-                label="Image"
-                id="image"
-                value={request.image}
-                onChange={handleChange('image')}
-              //error={user.passwordError != null}
-              //helperText={user.passwordError}
-              />
+              {request.hasImage ? (
+                <React.Fragment>
+                <Cropper
+                  ref={cropper}
+                  preview='.img-preview'
+                  src={request.imageData}
+                  style={{height: '400px', width: '100%'}}
+                  // Cropper.js options
+                  aspectRatio={1 / 1}
+                  guides={false}
+                  scalable={false}
+                  zoomable={false}
+                  autoCrop={true}
+                  cropend={onCrop}
+                />
+                <div className={"img-preview"} style={{overflow: 'hidden', width: '300px', height: '300px'}}/>
+                </React.Fragment>
+              ) : (
+                <React.Fragment/>
+              )}                            
             </Grid>
           </Grid>
           <Button
@@ -153,7 +245,7 @@ export default function NewRequestFrom() {
             fullWidth
             variant="contained"
             color="primary"
-            disabled={!isFormValid()}
+            //disabled={!isFormValid()}
             className={classes.submit}
           >
             Submit

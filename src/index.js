@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { createHttpLink } from "apollo-link-http";
+import { createLink } from "apollo-absinthe-upload-link";
 import { setContext } from "apollo-link-context";
 import * as serviceWorker from "./serviceWorker";
 
@@ -16,7 +17,7 @@ import { resolvers, typeDefs } from "./Resolvers";
 // on the React context so the client can be conveniently accessed
 // from anywhere in the component tree.
 
-const httpLink = createHttpLink({
+const httpLink = createLink({
   uri: 'http://localhost:4000'
 });
 
