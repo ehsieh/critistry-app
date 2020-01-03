@@ -42,9 +42,9 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2),
   },  
   upload: {
-    width: '300px',
+    width: '100%',
     height: '300px',
-    textAlign: 'center'
+    textAlign: 'center',    
   },
   image: {
     maxWidth: '700px'
@@ -158,34 +158,7 @@ export default function NewRequestFrom() {
           }}
         >
           <Grid container spacing={2}>
-          <Grid item xs={8}>
-              <TextField
-                name="title"
-                variant="outlined"
-                required
-                fullWidth
-                id="title"
-                label="Title"
-                value={request.title}
-                className={classes.title}
-                onChange={handleChange('title')}
-                autoFocus              
-              />
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                multiline
-                rows="12"
-                id="description"
-                label="Description"
-                name="description"
-                value={request.description}
-                className={classes.description}
-                onChange={handleChange('description')}     
-              />       
-            </Grid>
-            <Grid item xs={4}>
+          <Grid item xs={4}>
               <div>
                 <Paper className={classes.upload} elevation={2}>
                 <div {...getRootProps()}>
@@ -217,6 +190,33 @@ export default function NewRequestFrom() {
                 </Paper>
               </div>                            
             </Grid>                         
+          <Grid item xs={8}>
+              <TextField
+                name="title"
+                variant="outlined"
+                required
+                fullWidth
+                id="title"
+                label="Title"
+                value={request.title}
+                className={classes.title}
+                onChange={handleChange('title')}
+                autoFocus              
+              />
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                multiline
+                rows="12"
+                id="description"
+                label="Description"
+                name="description"
+                value={request.description}
+                className={classes.description}
+                onChange={handleChange('description')}     
+              />       
+            </Grid>            
             <Grid item xs={12}>
               {request.hasImage ? (
                 <React.Fragment>
