@@ -17,6 +17,7 @@ import { useHistory } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
+import ImagePicker from './ImagePicker';
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -158,39 +159,10 @@ export default function NewRequestFrom() {
           }}
         >
           <Grid container spacing={2}>
-          <Grid item xs={4}>
-              <div>
-                <Paper className={classes.upload} elevation={2}>
-                <div {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  {isDragActive ? (
-                    <ImageOutlinedIcon className={classes.icon}/>
-                  ) : (
-                    <ImageSearchOutlinedIcon className={classes.icon}/>
-                  )}
-                </div>
-                <Typography>
-                  Drag and drop your image here or
-                </Typography>
-                <input
-                  accept="image/*"
-                  className={classes.input}
-                  id="button-file"
-                  type="file"
-                />
-                <label htmlFor="button-file">
-                  <Button
-                    component="span"
-                    variant="contained"
-                    color="primary"                                    
-                  >
-                    Browse for image
-                  </Button>
-                </label>
-                </Paper>
-              </div>                            
+            <Grid item xs={4}>
+              <ImagePicker />                
             </Grid>                         
-          <Grid item xs={8}>
+            <Grid item xs={8}>
               <TextField
                 name="title"
                 variant="outlined"
