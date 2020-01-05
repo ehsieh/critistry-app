@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function ImagePicker() {
+export default function ImagePicker(props) {
   const classes = useStyles();
   const onDrop = useCallback(files => {        
     const reader = new FileReader();
@@ -61,15 +61,10 @@ export default function ImagePicker() {
 
       setState({
         ...state,
-        isDialogOpen: true
-      })
-      /*
-      setRequest({
-        ...request,
+        image: files[0],
         imageData: reader.result,
-        hasImage: true,
-        image: files[0]
-      });*/      
+        isDialogOpen: true
+      })     
     };    
     reader.readAsDataURL(files[0]);
   }, []);
@@ -78,6 +73,7 @@ export default function ImagePicker() {
 
   const [state, setState] = useState({      
     image: null,
+    imageData: null,
     thumbnail: null,
     isDialogOpen: false
   })
@@ -94,8 +90,16 @@ export default function ImagePicker() {
     setState({
       ...state,
       thumbnail: img
-    })    
+    })        
     console.log(img);
+  };
+
+  const onCropComplete = () => {
+    setState({      
+      ...state,
+      isDialogOpen: false
+    })
+    props.onImagePicked(state.image, state.thumbnail);
   };
 
   const cropper = useRef(null);
@@ -145,7 +149,7 @@ export default function ImagePicker() {
           <Cropper
             ref={cropper}
             preview='.img-preview'
-            src={"http://localhost:4000/images/crit-images/crit-image-9.jpg"}
+            src={state.imageData}
             style={{height: '400px', width: '100%'}}
             // Cropper.js options
             aspectRatio={1 / 1}
@@ -153,7 +157,7 @@ export default function ImagePicker() {
             scalable={false}
             zoomable={false}
             autoCrop={true}
-            cropend={onCrop}
+            crop={onCrop}
           />
           <Paper className={classes.preview} elevation={2}>
             <div className={"img-preview"} style={{overflow: 'hidden', width: '300px', height: '300px'}}/>          
@@ -161,7 +165,8 @@ export default function ImagePicker() {
               component="span"
               variant="contained"
               color="primary"    
-              className={classes.button}                                
+              className={classes.button}                
+              onClick={onCropComplete}                
             >
               Crop Thumbnail
             </Button>

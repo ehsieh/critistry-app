@@ -47,8 +47,9 @@ const useStyles = makeStyles(theme => ({
     height: '300px',
     textAlign: 'center',    
   },
-  image: {
-    maxWidth: '700px'
+  thumbnail: {
+    width: '100%',
+    height: '300px'
   },
   icon: {
     width: '100px',
@@ -91,7 +92,8 @@ export default function NewRequestFrom() {
     hasImage: false,    
     image: null,    
     imageData: null,
-    thumbnail:null
+    thumbnail:null,
+    hasThumbnail: false
   })
 
   const handleChange = name => event => {
@@ -124,14 +126,17 @@ export default function NewRequestFrom() {
   }, [request]);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-  const cropper = useRef(null);
+  const cropper = useRef(null);  
 
-  const onCrop = () => {        
-    const img = cropper.current.getCroppedCanvas().toDataURL("image/jpeg", 0.7);    
+  const onImagePicked = (image, thumbnail) => {
     setRequest({
       ...request,
-      thumbnail: img
-    })    
+      image: image,
+      thumbnail: thumbnail,
+      hasThumbnail: true
+    });
+    console.log(image);
+    console.log(thumbnail);
   };
 
   return (
@@ -160,7 +165,11 @@ export default function NewRequestFrom() {
         >
           <Grid container spacing={2}>
             <Grid item xs={4}>
-              <ImagePicker />                
+              {request.hasThumbnail ?               
+                <img className={classes.thumbnail} src={request.thumbnail} />
+                :
+                <ImagePicker onImagePicked={onImagePicked} />                
+              }
             </Grid>                         
             <Grid item xs={8}>
               <TextField
@@ -188,29 +197,7 @@ export default function NewRequestFrom() {
                 className={classes.description}
                 onChange={handleChange('description')}     
               />       
-            </Grid>            
-            <Grid item xs={12}>
-              {request.hasImage ? (
-                <React.Fragment>
-                <Cropper
-                  ref={cropper}
-                  preview='.img-preview'
-                  src={request.imageData}
-                  style={{height: '400px', width: '100%'}}
-                  // Cropper.js options
-                  aspectRatio={1 / 1}
-                  guides={false}
-                  scalable={false}
-                  zoomable={false}
-                  autoCrop={true}
-                  cropend={onCrop}
-                />
-                <div className={"img-preview"} style={{overflow: 'hidden', width: '300px', height: '300px'}}/>
-                </React.Fragment>
-              ) : (
-                <React.Fragment/>
-              )}                            
-            </Grid>
+            </Grid>                        
           </Grid>
           <Button
             type="submit"
