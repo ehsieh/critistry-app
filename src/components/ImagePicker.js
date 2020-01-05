@@ -8,7 +8,10 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import ImageOutlinedIcon from '@material-ui/icons/ImageOutlined';
 import ImageSearchOutlinedIcon from '@material-ui/icons/ImageSearchOutlined';
-
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
+import Cropper from 'react-cropper';
+import 'cropperjs/dist/cropper.css';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -24,6 +27,16 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     height: '300px',
     textAlign: 'center',    
+  },
+  preview: {
+    paddingTop: theme.spacing(2),    
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  button: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2)
   },
   image: {
     maxWidth: '700px'
@@ -45,6 +58,11 @@ export default function ImagePicker() {
     const reader = new FileReader();
     reader.onloadend = (e) => {
       console.log(files[0]);
+
+      setState({
+        ...state,
+        isDialogOpen: true
+      })
       /*
       setRequest({
         ...request,
@@ -57,6 +75,30 @@ export default function ImagePicker() {
   }, []);
   
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
+  const [state, setState] = useState({      
+    image: null,
+    thumbnail: null,
+    isDialogOpen: false
+  })
+
+  const handleDialogClose = () => {
+    setState({      
+      ...state,
+      isDialogOpen: false
+    })
+  };
+
+  const onCrop = () => {        
+    const img = cropper.current.getCroppedCanvas().toDataURL("image/jpeg", 0.7);    
+    setState({
+      ...state,
+      thumbnail: img
+    })    
+    console.log(img);
+  };
+
+  const cropper = useRef(null);
 
   return (
     <React.Fragment>
@@ -95,6 +137,36 @@ export default function ImagePicker() {
           )}
         </div>        
       </Paper>
+      <Dialog
+        onClose={handleDialogClose}
+        aria-labelledby="image-picker" 
+        open={state.isDialogOpen}>
+          <DialogTitle id="image-picker">Select your image thumbnail</DialogTitle>            
+          <Cropper
+            ref={cropper}
+            preview='.img-preview'
+            src={"http://localhost:4000/images/crit-images/crit-image-9.jpg"}
+            style={{height: '400px', width: '100%'}}
+            // Cropper.js options
+            aspectRatio={1 / 1}
+            guides={false}
+            scalable={false}
+            zoomable={false}
+            autoCrop={true}
+            cropend={onCrop}
+          />
+          <Paper className={classes.preview} elevation={2}>
+            <div className={"img-preview"} style={{overflow: 'hidden', width: '300px', height: '300px'}}/>          
+            <Button
+              component="span"
+              variant="contained"
+              color="primary"    
+              className={classes.button}                                
+            >
+              Crop Thumbnail
+            </Button>
+          </Paper>
+      </Dialog>
     </React.Fragment>
   )
 };
