@@ -69,8 +69,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function NewRequestFrom() {
   const NEW_REQUEST_MUTATION = gql`
-  mutation create_crit_request($title: String!, $description: String!, $image: String!) {
-    create_crit_request(title: $title, description: $description, image: $image) {      
+  mutation create_crit_request($title: String!, $description: String!, $thumbnail: String!, $file: Upload!) {
+    create_crit_request(title: $title, description: $description, thumbnail: $thumbnail, file: $file) {      
       id
       title
       description
@@ -111,23 +111,7 @@ export default function NewRequestFrom() {
       request.image != null
     );
   };
-
-  const onDrop = useCallback(files => {        
-    const reader = new FileReader();
-    reader.onloadend = (e) => {
-      setRequest({
-        ...request,
-        imageData: reader.result,
-        hasImage: true,
-        image: files[0]
-      });      
-    };    
-    reader.readAsDataURL(files[0]);
-  }, [request]);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
-
-  const cropper = useRef(null);  
-
+  
   const onImagePicked = (image, thumbnail) => {
     setRequest({
       ...request,
@@ -152,15 +136,16 @@ export default function NewRequestFrom() {
           onSubmit={e => {
             console.log(request);
             e.preventDefault();
-            /*
+            
             create_new_request({
               variables:
               {
                 title: request.title,
                 description: request.description,
-                image: request.image
+                file: request.image,
+                thumbnail: request.thumbnail
               }
-            })*/             
+            })             
           }}
         >
           <Grid container spacing={2}>
@@ -204,7 +189,7 @@ export default function NewRequestFrom() {
             fullWidth
             variant="contained"
             color="primary"
-            //disabled={!isFormValid()}
+            disabled={!isFormValid()}
             className={classes.submit}
           >
             Submit

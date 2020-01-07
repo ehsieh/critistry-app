@@ -18,6 +18,7 @@ const GET_REQUESTS = gql`
       title
       description
       image
+      thumbnail
       user
       {
         username
@@ -88,7 +89,7 @@ export function RequestList() {
     <GridList cellHeight={260} className={classes.gridList} cols={getGridListCols()}>
     {data.critRequests.map(r => (
       <GridListTile key={r.id} cols={1}>
-        <img src={r.image} alt={r.title} />
+        <img src={r.thumbnail == null ? r.image : r.thumbnail} alt={r.title} />
         <GridListTileBar
             title={<Link className={classes.link} href={`/request/${r.id}`}>{r.title}</Link>}
             subtitle={<span>by: {r.user.username}</span>}        
